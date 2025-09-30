@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>信息武器库 - OSINT情报收集系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/static/css/main.css?v={{ request.query_params.get('v', '') or '' }}" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-search-location me-2"></i>
+                OSINT情报收集系统
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">返回主页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/docs" target="_blank">API文档</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>
+                        <i class="fas fa-warehouse me-2"></i>
+                        信息武器库
+                    </h2>
+                    <a href="/" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        返回主页
+                    </a>
+                </div>
+                
+                <!-- 功能导航标签 -->
+                <ul class="nav nav-tabs mb-4" id="arsenalTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="persons-tab" data-bs-toggle="tab" data-bs-target="#persons" type="button" role="tab" aria-controls="persons" aria-selected="true">
+                            <i class="fas fa-users me-1"></i>已导入人物
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="analysis-tab" data-bs-toggle="tab" data-bs-target="#analysis" type="button" role="tab" aria-controls="analysis" aria-selected="false">
+                            <i class="fas fa-brain me-1"></i>全面档案分析
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab" aria-controls="reports" aria-selected="false">
+                            <i class="fas fa-chart-line me-1"></i>分析报告查看
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">
+                            <i class="fas fa-user-secret me-1"></i>人物画像构建
+                        </button>
+                    </li>
+                </ul>
+                
+                <!-- 标签页内容 -->
+                <div class="tab-content" id="arsenalTabContent">
+                    <!-- 已导入人物标签页 -->
+                    <div class="tab-pane fade show active" id="persons" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-users me-2"></i>
+                                    已导入人物档案
+                                </h5>
+                                <button class="btn btn-outline-primary btn-sm" onclick="refreshPersons()">
+                                    <i class="fas fa-sync-alt me-1"></i>
+                                    刷新
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div id="personsContainer">
+                                    <div class="text-center text-muted py-4">
+                                        <i class="fas fa-id-card fa-3x mb-3"></i>
+                                        <p>暂无导入人物</p>
+                                        <p class="small">在全面档案分析中导入人物资料后，这里会显示人物卡片</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 全面档案分析标签页 -->
+                    <div class="tab-pane fade" id="analysis" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-brain me-2"></i>
+                                    全面档案分析 - 18维度深度分析
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- 文本智能导入区域 -->
+                                <div class="card mb-4" style="background-color: #1f2937; border-color: #374151;">
+                                    <div class="card-header" style="background-color: #111827; border-color: #374151;">
+                                        <h6 class="mb-0 text-success">
+                                            <i class="fas fa-magic me-2"></i>AI智能文本解析导入
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                <i class="fas fa-file-text me-1"></i>
+                                                粘贴人物信息文本（支持简历、社交媒体资料、新闻报道等）
+                                            </label>
+                                            <textarea class="form-control" id="textImportArea" rows="6" 
+                                                      placeholder="请粘贴包含人物信息的文本内容，例如：
+张三，男，28岁，毕业于北京大学计算机系，现任腾讯公司高级工程师，擅长Java、Python开发。
+工作经历：2018-2020年在阿里巴巴担任前端开发，2020年至今在腾讯负责后端架构设计。
+联系方式：zhangsan@qq.com，手机号13800138000
+兴趣爱好：篮球、阅读、旅游
+家庭住址：北京市朝阳区建国路88号"></textarea>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <button class="btn btn-success" onclick="importFromText()">
+                                                    <i class="fas fa-magic me-1"></i>
+                                                    开始智能解析
+                                                </button>
+                                                <button class="btn btn-outline-secondary ms-2" onclick="clearTextImport()">
+                                                    <i class="fas fa-eraser me-1"></i>
+                                                    清空文本
+                                                </button>
+                                            </div>
+                                            <div class="col-md-6 text-end">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-info-circle me-1"></i>
+                                                    AI将自动识别并提取人物信息，填充到下方表单中
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div id="textImportStatus" class="mt-3" style="display: none;">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-spinner fa-spin me-2"></i>
+                                                <span id="textImportMessage">正在解析文本...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 人物档案导入区域 -->
+                                <div class="card mb-4" style="background-color: #1f2937; border-color: #374151;">
+                                    <div class="card-header" style="background-color: #111827; border-color: #374151;">
+                                        <h6 class="mb-0 text-primary">
+                                            <i class="fas fa-download me-2"></i>导入现有档案
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row align-items-end">
+                                            <div class="col-md-6">
+                                                <label class="form-label">选择已保存的人物档案</label>
+                                                <select class="form-select" id="profileImportSelect" onchange="importProfileData()">
+                                                    <option value="">请选择要导入的人物档案...</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <button class="btn btn-outline-primary" onclick="refreshProfileList()">
+                                                    <i class="fas fa-sync-alt me-1"></i>刷新档案列表
+                                                </button>
+                                                <button class="btn btn-outline-success ms-2" onclick="clearAllFormData()">
+                                                    <i class="fas fa-eraser me-1"></i>清空所有数据
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <small class="text-muted">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                选择现有档案后，系统会自动填充表单中匹配的字段，您可以在此基础上进行补充和修改
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <form id="comprehensiveAnalysisForm">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6 class="text-primary mb-3">
+                                                <i class="fas fa-user me-1"></i>1. 基础身份信息
+                                            </h6>
+                                            <div class="mb-3">
+                                                <label class="form-label">姓名 *</label>
+                                                <input type="text" class="form-control" name="name" required>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label class="form-label">性别</label>
+                                                    <select class="form-select" name="gender">
+                                                        <option value="">请选择</option>
+                                                        <option value="男">男</option>
+                                                        <option value="女">女</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">年龄</label>
+                                                    <input type="number" class="form-control" name="age" min="0" max="150">
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">出生日期</label>
+                                                <input type="date" class="form-control" name="birth_date">
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label class="form-label">星座</label>
+                                                    <select class="form-select" name="constellation">
+                                                        <option value="">请选择</option>
+                                                        <option value="白羊座">白羊座</option>
+                                                        <option value="金牛座">金牛座</option>
+                                                        <option value="双子座">双子座</option>
+                                                        <option value="巨蟹座">巨蟹座</option>
+                                                        <option value="狮子座">狮子座</option>
+                                                        <option value="处女座">处女座</option>
+                                                        <option value="天秤座">天秤座</option>
+                                                        <option value="天蝎座">天蝎座</option>
+                                                        <option value="射手座">射手座</option>
+                                                        <option value="摩羯座">摩羯座</option>
+                                                        <option value="水瓶座">水瓶座</option>
+                                                        <option value="双鱼座">双鱼座</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">生肖</label>
+                                                    <select class="form-select" name="zodiac">
+                                                        <option value="">请选择</option>
+                                                        <option value="鼠">鼠</option>
+                                                        <option value="牛">牛</option>
+                                                        <option value="虎">虎</option>
+                                                        <option value="兔">兔</option>
+                                                        <option value="龙">龙</option>
+                                                        <option value="蛇">蛇</option>
+                                                        <option value="马">马</option>
+                                                        <option value="羊">羊</option>
+                                                        <option value="猴">猴</option>
+                                                        <option value="鸡">鸡</option>
+                                                        <option value="狗">狗</option>
+                                                        <option value="猪">猪</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">身份证号</label>
+                                                <input type="text" class="form-control" name="id_number" placeholder="多个用逗号分隔">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">户籍地</label>
+                                                <input type="text" class="form-control" name="hukou_place">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">现居地</label>
+                                                <input type="text" class="form-control" name="current_address">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <h6 class="text-primary mb-3">
+                                                <i class="fas fa-graduation-cap me-1"></i>2. 教育与专业背景
+                                            </h6>
+                                            <div class="mb-3">
+                                                <label class="form-label">学历层次</label>
+                                                <select class="form-select" name="education_level">
+                                                    <option value="">请选择</option>
+                                                    <option value="小学">小学</option>
+                                                    <option value="初中">初中</option>
+                                                    <option value="高中">高中</option>
+                                                    <option value="大专">大专</option>
+                                                    <option value="本科">本科</option>
+                                                    <option value="硕士">硕士</option>
+                                                    <option value="博士">博士</option>
+                                                    <option value="博士后">博士后</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">毕业院校</label>
+                                                <input type="text" class="form-control" name="university">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">专业方向</label>
+                                                <input type="text" class="form-control" name="major">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">专业技能</label>
+                                                <textarea class="form-control" name="skills" rows="3" placeholder="多个技能用逗号分隔"></textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">语言能力</label>
+                                                <input type="text" class="form-control" name="languages" placeholder="如：中文(母语)、英语(流利)、日语(基础)">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <hr class="my-4">
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6 class="text-primary mb-3">
+                                                <i class="fas fa-briefcase me-1"></i>3. 职业发展轨迹
+                                            </h6>
+                                            <div class="mb-3">
+                                                <label class="form-label">现任职位</label>
+                                                <input type="text" class="form-control" name="current_job">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">公司名称</label>
+                                                <input type="text" class="form-control" name="current_company">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">行业领域</label>
+                                                <input type="text" class="form-control" name="industry">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">工作年限</label>
+                                                <input type="number" class="form-control" name="work_years" min="0">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">职业发展路径</label>
+                                                <textarea class="form-control" name="career_path" rows="3" placeholder="描述职业发展历程"></textarea>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <h6 class="text-primary mb-3">
+                                                <i class="fas fa-coins me-1"></i>4. 财务状况与消费习惯
+                                            </h6>
+                                            <div class="mb-3">
+                                                <label class="form-label">收入水平</label>
+                                                <select class="form-select" name="income_level">
+                                                    <option value="">请选择</option>
+                                                    <option value="5万以下">5万以下/年</option>
+                                                    <option value="5-10万">5-10万/年</option>
+                                                    <option value="10-20万">10-20万/年</option>
+                                                    <option value="20-50万">20-50万/年</option>
+                                                    <option value="50-100万">50-100万/年</option>
+                                                    <option value="100万以上">100万以上/年</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">消费能力</label>
+                                                <select class="form-select" name="consumption_ability">
+                                                    <option value="">请选择</option>
+                                                    <option value="节俭型">节俭型</option>
+                                                    <option value="理性型">理性型</option>
+                                                    <option value="享受型">享受型</option>
+                                                    <option value="奢侈型">奢侈型</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">投资偏好</label>
+                                                <select class="form-select" name="investment_preference">
+                                                    <option value="">请选择</option>
+                                                    <option value="保守型">保守型</option>
+                                                    <option value="稳健型">稳健型</option>
+                                                    <option value="积极型">积极型</option>
+                                                    <option value="激进型">激进型</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">主要消费领域</label>
+                                                <textarea class="form-control" name="consumption_areas" rows="2" placeholder="如：教育、旅游、奢侈品、投资等"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <hr class="my-4">
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6 class="text-primary mb-3">
+                                                <i class="fas fa-globe me-1"></i>5. 社交媒体与网络行为
+                                            </h6>
+                                            <div class="mb-3">
+                                                <label class="form-label">微信</label>
+                                                <input type="text" class="form-control" name="wechat_id">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">微博</label>
+                                                <input type="text" class="form-control" name="weibo_id">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">抖音</label>
+                                                <input type="text" class="form-control" name="douyin_id">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">小红书</label>
+                                                <input type="text" class="form-control" name="xhs_id">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">网络活跃度</label>
+                                                <select class="form-select" name="online_activity">
+                                                    <option value="">请选择</option>
+                                                    <option value="极高">极高（每天多次发布）</option>
+                                                    <option value="高">高（每天发布）</option>
+                                                    <option value="中等">中等（每周发布）</option>
+                                                    <option value="低">低（偶尔发布）</option>
+                                                    <option value="极低">极低（很少发布）</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <h6 class="text-primary mb-3">
+                                                <i class="fas fa-users me-1"></i>6. 社交关系网络
+                                            </h6>
+                                            <div class="mb-3">
+                                                <label class="form-label">社交圈层</label>
+                                                <select class="form-select" name="social_circle">
+                                                    <option value="">请选择</option>
+                                                    <option value="核心圈">核心圈（5-10人）</option>
+                                                    <option value="紧密圈">紧密圈（10-30人）</option>
+                                                    <option value="扩展圈">扩展圈（30-100人）</option>
+                                                    <option value="广泛圈">广泛圈（100人以上）</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">社交频率</label>
+                                                <select class="form-select" name="social_frequency">
+                                                    <option value="">请选择</option>
+                                                    <option value="每天">每天</option>
+                                                    <option value="每周">每周</option>
+                                                    <option value="每月">每月</option>
+                                                    <option value="偶尔">偶尔</option>
+                                                    <option value="很少">很少</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">社交活动类型</label>
+                                                <textarea class="form-control" name="social_activities" rows="2" placeholder="如：聚餐、运动、旅游、商务等"></textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">人际关系处理</label>
+                                                <select class="form-select" name="relationship_handling">
+                                                    <option value="">请选择</option>
+                                                    <option value="主动型">主动型</option>
+                                                    <option value="被动型">被动型</option>
+                                                    <option value="平衡型">平衡型</option>
+                                                    <option value="回避型">回避型</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <hr class="my-4">
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6 class="text-primary mb-3">
+                                                <i class="fas fa-brain me-1"></i>7. 心理特征与性格分析
+                                            </h6>
+                                            <div class="mb-3">
+                                                <label class="form-label">大五人格 - 开放性</label>
+                                                <select class="form-select" name="openness">
+                                                    <option value="">请选择</option>
+                                                    <option value="极高">极高（9-10分）</option>
+                                                    <option value="高">高（7-8分）</option>
+                                                    <option value="中等">中等（5-6分）</option>
+                                                    <option value="低">低（3-4分）</option>
+                                                    <option value="极低">极低（1-2分）</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">大五人格 - 尽责性</label>
+                                                <select class="form-select" name="conscientiousness">
+                                                    <option value="">请选择</option>
+                                                    <option value="极高">极高（9-10分）</option>
+                                                    <option value="高">高（7-8分）</option>
+                                                    <option value="中等">中等（5-6分）</option>
+                                                    <option value="低">低（3-4分）</option>
+                                                    <option value="极低">极低（1-2分）</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">大五人格 - 外向性</label>
+                                                <select class="form-select" name="extraversion">
+                                                    <option value="">请选择</option>
+                                                    <option value="极高">极高（9-10分）</option>
+                                                    <option value="高">高（7-8分）</option>
+                                                    <option value="中等">中等（5-6分）</option>
+                                                    <option value="低">低（3-4分）</option>
+                                                    <option value="极低">极低（1-2分）</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">决策风格</label>
+                                                <select class="form-select" name="decision_style">
+                                                    <option value="">请选择</option>
+                                                    <option value="理性分析">理性分析</option>
+                                                    <option value="直觉判断">直觉判断</option>
+                                                    <option value="情感驱动">情感驱动</option>
+                                                    <option value="从众跟随">从众跟随</option>
+                                                    <option value="权威依赖">权威依赖</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <h6 class="text-primary mb-3">
+                                                <i class="fas fa-chart-line me-1"></i>8. 行为模式与习惯
+                                            </h6>
+                                            <div class="mb-3">
+                                                <label class="form-label">作息时间</label>
+                                                <select class="form-select" name="sleep_schedule">
+                                                    <option value="">请选择</option>
+                                                    <option value="早睡早起">早睡早起（22:00-6:00）</option>
+                                                    <option value="正常作息">正常作息（23:00-7:00）</option>
+                                                    <option value="晚睡晚起">晚睡晚起（1:00-9:00）</option>
+                                                    <option value="不规律">不规律</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">运动习惯</label>
+                                                <select class="form-select" name="exercise_habit">
+                                                    <option value="">请选择</option>
+                                                    <option value="每天运动">每天运动</option>
+                                                    <option value="每周3-5次">每周3-5次</option>
+                                                    <option value="每周1-2次">每周1-2次</option>
+                                                    <option value="偶尔运动">偶尔运动</option>
+                                                    <option value="很少运动">很少运动</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">时间管理</label>
+                                                <select class="form-select" name="time_management">
+                                                    <option value="">请选择</option>
+                                                    <option value="极强">极强（计划详细，执行严格）</option>
+                                                    <option value="强">强（有计划，基本执行）</option>
+                                                    <option value="中等">中等（有时计划，部分执行）</option>
+                                                    <option value="弱">弱（很少计划，随性而为）</option>
+                                                    <option value="极弱">极弱（无计划，完全随性）</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">兴趣爱好</label>
+                                                <textarea class="form-control" name="hobbies" rows="2" placeholder="如：阅读、运动、音乐、旅游、游戏等"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <hr class="my-4">
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6 class="text-primary mb-3">
+                                                <i class="fas fa-shield-alt me-1"></i>9. 心理防线与弱点分析
+                                            </h6>
+                                            <div class="mb-3">
+                                                <label class="form-label">情感触发点</label>
+                                                <textarea class="form-control" name="emotional_triggers" rows="2" placeholder="描述容易引起情绪波动的话题或情况"></textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">敏感话题</label>
+                                                <textarea class="form-control" name="sensitive_topics" rows="2" placeholder="描述不愿意谈论或容易回避的话题"></textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">压力反应</label>
+                                                <select class="form-select" name="stress_response">
+                                                    <option value="">请选择</option>
+                                                    <option value="积极应对">积极应对</option>
+                                                    <option value="寻求帮助">寻求帮助</option>
+                                                    <option value="逃避回避">逃避回避</option>
+                                                    <option value="情绪爆发">情绪爆发</option>
+                                                    <option value="身体症状">身体症状</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">安全感来源</label>
+                                                <textarea class="form-control" name="security_sources" rows="2" placeholder="描述什么能带来安全感，如金钱、关系、成就等"></textarea>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <h6 class="text-primary mb-3">
+                                                <i class="fas fa-bullseye me-1"></i>10. 影响策略与接触方式
+                                            </h6>
+                                            <div class="mb-3">
+                                                <label class="form-label">信任建立方式</label>
+                                                <select class="form-select" name="trust_building">
+                                                    <option value="">请选择</option>
+                                                    <option value="共同经历">共同经历</option>
+                                                    <option value="专业能力">专业能力</option>
+                                                    <option value="社交推荐">社交推荐</option>
+                                                    <option value="利益交换">利益交换</option>
+                                                    <option value="时间积累">时间积累</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">沟通偏好</label>
+                                                <select class="form-select" name="communication_preference">
+                                                    <option value="">请选择</option>
+                                                    <option value="面对面">面对面</option>
+                                                    <option value="电话">电话</option>
+                                                    <option value="文字消息">文字消息</option>
+                                                    <option value="视频通话">视频通话</option>
+                                                    <option value="邮件">邮件</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">说服技巧</label>
+                                                <select class="form-select" name="persuasion_technique">
+                                                    <option value="">请选择</option>
+                                                    <option value="逻辑论证">逻辑论证</option>
+                                                    <option value="情感共鸣">情感共鸣</option>
+                                                    <option value="权威引用">权威引用</option>
+                                                    <option value="社会认同">社会认同</option>
+                                                    <option value="稀缺性">稀缺性</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">共同话题</label>
+                                                <textarea class="form-control" name="common_topics" rows="2" placeholder="描述可能的共同兴趣或话题"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <hr class="my-4">
+                                    
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <h6 class="text-primary mb-3">
+                                                <i class="fas fa-sticky-note me-1"></i>11. 补充信息与备注
+                                            </h6>
+                                            <div class="mb-3">
+                                                <label class="form-label">重要事件时间线</label>
+                                                <textarea class="form-control" name="timeline" rows="3" placeholder="按时间顺序记录重要事件和转折点"></textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">行为观察记录</label>
+                                                <textarea class="form-control" name="behavior_observations" rows="3" placeholder="记录观察到的具体行为模式和反应"></textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">信息来源</label>
+                                                <textarea class="form-control" name="information_sources" rows="2" placeholder="记录信息的来源渠道和可信度"></textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">分析备注</label>
+                                                <textarea class="form-control" name="analysis_notes" rows="3" placeholder="记录分析过程中的思考和发现"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="text-center mt-4">
+                                        <button type="submit" class="btn btn-primary btn-lg me-3">
+                                            <i class="fas fa-save me-2"></i>保存全面档案
+                                        </button>
+                                        <button type="button" class="btn btn-secondary btn-lg" onclick="clearAnalysisForm()">
+                                            <i class="fas fa-eraser me-2"></i>清空表单
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 分析报告查看标签页 -->
+                    <div class="tab-pane fade" id="reports" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-chart-line me-2"></i>
+                                    全面档案分析报告查看
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="mb-3">
+                                            <label class="form-label">选择要查看分析报告的人物</label>
+                                            <select class="form-select" id="reportPersonSelect" onchange="loadAnalysisReport()">
+                                                <option value="">请选择人物...</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div id="reportContent" class="mt-4" style="display: none;">
+                                            <!-- 分析报告内容将在这里显示 -->
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="alert alert-info">
+                                            <h6><i class="fas fa-info-circle me-2"></i>报告说明</h6>
+                                            <p class="small mb-0">选择已建立全面档案分析的人物，查看详细的分析报告。报告包含18个维度的深度分析结果。</p>
+                                        </div>
+                                        
+                                        <div class="mt-3">
+                                            <button class="btn btn-outline-primary btn-sm" onclick="refreshReportPersonList()">
+                                                <i class="fas fa-sync-alt me-1"></i>刷新人物列表
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 人物画像构建标签页 -->
+                    <div class="tab-pane fade" id="profile" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-user-secret me-2"></i>
+                                    人物画像构建
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="mb-3">
+                                            <label class="form-label">选择已建立全面档案分析的人物</label>
+                                            <select class="form-select" id="profilePersonSelect" onchange="checkProfilePerson()">
+                                                <option value="">请选择人物...</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div id="profilePersonInfo" class="alert alert-info" style="display: none;">
+                                            <h6><i class="fas fa-user me-2"></i>人物档案信息</h6>
+                                            <div id="profilePersonDetails"></div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label">画像类型</label>
+                                            <select class="form-select" id="profileType">
+                                                <option value="">请选择画像类型...</option>
+                                                <option value="basic">基础画像</option>
+                                                <option value="psychological">心理画像</option>
+                                                <option value="behavioral">行为画像</option>
+                                                <option value="social">社交画像</option>
+                                                <option value="comprehensive">综合画像</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <button class="btn btn-primary" id="generateProfileBtn" onclick="generateProfile()" disabled>
+                                            <i class="fas fa-magic me-1"></i>生成画像
+                                        </button>
+                                        
+                                        <div id="profileStatus" class="mt-3" style="display: none;">
+                                            <div class="progress mb-2">
+                                                <div class="progress-bar bg-primary" role="progressbar" style="width: 0%"></div>
+                                            </div>
+                                            <small class="text-muted" id="profileProgress">画像生成中...</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="alert alert-success">
+                                            <h6><i class="fas fa-lightbulb me-2"></i>画像说明</h6>
+                                            <p class="small mb-0">基于全面档案分析结果，构建多维度的人物画像。画像将帮助您更好地了解目标，制定针对性的策略。</p>
+                                        </div>
+                                        
+                                        <div class="mt-3">
+                                            <button class="btn btn-outline-primary btn-sm" onclick="refreshProfilePersonList()">
+                                                <i class="fas fa-sync-alt me-1"></i>刷新人物列表
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 画像结果报告 -->
+                                <div class="row mt-4">
+                                    <div class="col-12">
+                                        <div class="card" id="profileReportCard" style="display: none;">
+                                            <div class="card-header">
+                                                <h5 class="card-title mb-0">
+                                                    <i class="fas fa-chart-pie me-2"></i>
+                                                    人物画像构建报告
+                                                </h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div id="profileReportContent">
+                                                    <!-- 画像结果将在这里显示 -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 人物详情模态框 -->
+    <div class="modal fade" id="personModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">人物详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="personDetails"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部 -->
+    <footer class="bg-dark text-light text-center py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">OSINT情报收集系统 v1.0.0 | 仅用于合法的开源情报收集</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/main.js?v={{ request.query_params.get('v', '') or '' }}"></script>
+</body>
+</html> 

@@ -1,0 +1,69 @@
+# Core Framework
+fastapi==0.104.1
+uvicorn==0.24.0
+pydantic==2.5.0
+python-multipart==0.0.6
+
+# Database
+sqlalchemy>=2.0.0
+alembic>=1.10.0
+
+# Data Collection
+requests==2.31.0
+httpx==0.25.2
+beautifulsoup4==4.12.2
+scrapy==2.11.0
+selenium==4.15.2
+aiohttp==3.9.1
+
+# AI/ML (可选，高级功能需要)
+openai>=1.0.0
+transformers>=4.20.0
+scikit-learn>=1.0.0
+
+# 中文NLP处理
+jieba>=0.42.1
+hanlp>=2.1.0
+
+# 基础文本处理
+fuzzywuzzy>=0.18.0
+python-levenshtein>=0.20.0
+
+# Graph Analysis
+networkx>=3.0.0
+
+# Web Scraping & Automation (可选)
+playwright>=1.30.0
+
+# Data Processing
+pandas==2.1.4
+numpy==1.25.2
+python-dateutil==2.8.2
+
+# Image Processing
+pillow==10.1.0
+
+# Async
+aiofiles>=23.0.0
+
+# Configuration
+python-dotenv==1.0.0
+pyyaml==6.0.1
+
+# Web Interface
+jinja2>=3.1.0
+
+# Logging
+loguru==0.7.2
+
+# Security
+cryptography==41.0.8
+passlib==1.7.4
+
+# API Documentation
+swagger-ui-bundle==0.0.9
+
+# Development
+pytest==7.4.3
+black==23.11.0
+flake8==6.1.0 

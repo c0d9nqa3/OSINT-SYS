@@ -1,0 +1,371 @@
+/* OSINT情报收集系统 - 深色主题样式 */
+
+/* 基础样式 */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0f1115;
+    color: #e5e7eb;
+}
+
+/* 基础页面样式 */
+#mainPage, #arsenalPage, #attackPage, #investigationPage {
+    background-color: #1a1a1a;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+#mainPage .card, #arsenalPage .card, #attackPage .card, #investigationPage .card {
+    background-color: #2a2a2a;
+    border: 2px solid #444;
+    margin-bottom: 20px;
+}
+
+#mainPage h2, #arsenalPage h2, #attackPage h2, #investigationPage h2 {
+    color: #ffffff;
+}
+
+#mainPage .text-light, #arsenalPage .text-light, #attackPage .text-light, #investigationPage .text-light {
+    color: #ffffff;
+}
+
+#mainPage .text-muted, #arsenalPage .text-muted, #attackPage .text-muted, #investigationPage .text-muted {
+    color: #cccccc;
+}
+
+.navbar.navbar-dark.bg-dark {
+    background-color: #0b0d11 !important;
+}
+
+/* 卡片样式 */
+.card {
+    background-color: #161a23;
+    color: #e5e7eb;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.6);
+}
+
+/* 进度条样式 */
+.progress {
+    background-color: #1f2430;
+}
+
+.progress-bar {
+    background-color: #2563eb;
+}
+
+/* 状态徽章样式 */
+.badge {
+    font-size: 0.8em;
+    padding: 0.5em 0.75em;
+}
+
+/* 按钮样式 */
+.btn {
+    transition: all 0.15s ease-in-out;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+/* 功能模块大按钮样式 */
+.btn-lg {
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.btn-lg:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.3);
+}
+
+/* 标签页样式优化 */
+.nav-tabs .nav-link {
+    color: #9ca3af;
+    border: none;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #e5e7eb;
+    border-bottom-color: #374151;
+}
+
+.nav-tabs .nav-link.active {
+    color: #93c5fd;
+    border-bottom-color: #2563eb;
+    background-color: transparent;
+}
+
+/* 表单分组标题样式 */
+.text-primary {
+    color: #93c5fd !important;
+}
+
+/* 分隔线样式 */
+hr.my-4 {
+    border-color: #374151;
+    opacity: 0.6;
+}
+
+.btn-outline-primary {
+    color: #93c5fd;
+    border-color: #1f3b70;
+}
+
+.btn-outline-primary:hover {
+    background-color: #1e3a8a;
+    border-color: #1e3a8a;
+    color: #e5e7eb;
+}
+
+.btn-primary {
+    background-color: #2563eb;
+    border-color: #2563eb;
+}
+
+.btn-success {
+    background-color: #16a34a;
+    border-color: #16a34a;
+}
+
+.btn-danger {
+    background-color: #dc2626;
+    border-color: #dc2626;
+}
+
+/* 表单控件 */
+.form-control, .form-select, textarea {
+    background-color: #111827;
+    color: #e5e7eb;
+    border: 1px solid #374151;
+}
+
+.form-control::placeholder, textarea::placeholder {
+    color: #9ca3af;
+}
+
+/* 表格样式 */
+.table {
+    color: #e5e7eb;
+}
+
+.table-sm td, .table td, .table th {
+    border-top: 1px solid #303644;
+}
+
+/* 模态框样式 */
+.modal-content {
+    background-color: #161a23;
+    color: #e5e7eb;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.modal-header, .modal-footer {
+    border-color: #303644;
+}
+
+/* 警告框样式（深色） */
+.alert {
+    background-color: #111827;
+    border-left: 4px solid;
+    border-radius: 0.375rem;
+    color: #e5e7eb;
+}
+
+.alert-warning { border-left-color: #eab308; }
+.alert-success { border-left-color: #16a34a; }
+.alert-danger { border-left-color: #dc2626; }
+.alert-info { border-left-color: #0ea5e9; }
+
+/* 代码样式 */
+code {
+    background-color: #0b0d11;
+    color: #f59e0b;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+}
+
+/* 列表样式 */
+.list-group-item {
+    background-color: #161a23;
+    color: #e5e7eb;
+    border-color: #303644;
+}
+
+/* 网络图容器（深色） */
+.network-container {
+    border: 1px solid #303644;
+    border-radius: 0.375rem;
+    min-height: 400px;
+    background-color: #111827;
+}
+
+/* 时间线（深色） */
+.timeline::before {
+    background-color: #303644;
+}
+
+.timeline-item::before {
+    background-color: #2563eb;
+    border: 2px solid #161a23;
+    box-shadow: 0 0 0 2px #303644;
+}
+
+/* 页脚 */
+footer.bg-dark {
+    background-color: #0b0d11 !important;
+    color: #9ca3af;
+}
+
+/* 链接颜色 */
+a { color: #93c5fd; }
+a:hover { color: #bfdbfe; }
+
+/* 小提示浮层 */
+.tooltip {
+    pointer-events: none;
+}
+
+/* 自定义动画 */
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.fa-spin { animation: spin 1s linear infinite; }
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .modal-xl {
+        max-width: 95%;
+    }
+}
+
+/* 加载动画 */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.fa-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* 自定义动画 */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* 工具提示样式 */
+.tooltip {
+    pointer-events: none;
+}
+
+/* 代码样式 */
+code {
+    background-color: #f8f9fa;
+    color: #e83e8c;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+}
+
+/* 列表样式 */
+.list-group-item {
+    border-left: none;
+    border-right: none;
+}
+
+.list-group-item:first-child {
+    border-top: none;
+}
+
+.list-group-item:last-child {
+    border-bottom: none;
+}
+
+/* 状态颜色 */
+.text-collecting { color: #0d6efd; }
+.text-verifying { color: #20c997; }
+.text-analyzing { color: #ffc107; }
+.text-completed { color: #198754; }
+.text-failed { color: #dc3545; }
+
+/* 关系网络样式 */
+.relationship-badge {
+    font-size: 0.75em;
+    margin: 2px;
+}
+
+/* 技能标签样式 */
+.skill-tag {
+    display: inline-block;
+    margin: 2px;
+    transition: all 0.2s ease;
+}
+
+.skill-tag:hover {
+    transform: scale(1.05);
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* 打印样式 */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    .card {
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+    
+    .btn {
+        display: none;
+    }
+} 

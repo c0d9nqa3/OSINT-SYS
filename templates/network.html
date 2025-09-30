@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关系网络构建分析 - OSINT情报收集系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/static/css/main.css?v={{ request.query_params.get('v', '') or '' }}" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-search-location me-2"></i>
+                OSINT情报收集系统
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">返回主页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/docs" target="_blank">API文档</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>
+                        <i class="fas fa-project-diagram me-2"></i>
+                        关系网络构建分析
+                    </h2>
+                    <a href="/" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        返回主页
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- 左侧 - 网络构建控制 -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-cogs me-2"></i>
+                            网络构建控制
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="networkForm">
+                            <div class="mb-3">
+                                <label for="centerPerson" class="form-label">中心人物</label>
+                                <select class="form-select" id="centerPerson" required>
+                                    <option value="">请选择中心人物...</option>
+                                </select>
+                                <div class="form-text">选择要构建关系网络的核心人物</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="networkDepth" class="form-label">网络深度</label>
+                                <select class="form-select" id="networkDepth">
+                                    <option value="1">1级关系（直接关系）</option>
+                                    <option value="2" selected>2级关系（间接关系）</option>
+                                    <option value="3">3级关系（深层关系）</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="relationshipTypes" class="form-label">关系类型</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="family" value="family" checked>
+                                    <label class="form-check-label" for="family">家庭关系</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="work" value="work" checked>
+                                    <label class="form-check-label" for="work">工作关系</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="social" value="social" checked>
+                                    <label class="form-check-label" for="social">社交关系</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="online" value="online">
+                                    <label class="form-check-label" for="online">网络关系</label>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-project-diagram me-2"></i>
+                                构建关系网络
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 网络分析工具 -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-chart-line me-2"></i>
+                            网络分析工具
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-info btn-sm" onclick="analyzeCentrality()">
+                                <i class="fas fa-bullseye me-1"></i>中心性分析
+                            </button>
+                            <button class="btn btn-outline-warning btn-sm" onclick="analyzeCommunities()">
+                                <i class="fas fa-users me-1"></i>社群检测
+                            </button>
+                            <button class="btn btn-outline-success btn-sm" onclick="findKeyNodes()">
+                                <i class="fas fa-star me-1"></i>关键节点识别
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="analyzeInfluence()">
+                                <i class="fas fa-chart-bar me-1"></i>影响力分析
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 分析结果 -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-clipboard-list me-2"></i>
+                            分析结果
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="analysisResults">
+                            <div class="text-center text-muted py-3">
+                                <i class="fas fa-chart-line fa-2x mb-2"></i>
+                                <p class="small">点击分析工具查看结果</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧 - 网络可视化 -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-sitemap me-2"></i>
+                            关系网络图
+                        </h5>
+                        <div>
+                            <button class="btn btn-outline-secondary btn-sm me-2" onclick="resetNetwork()">
+                                <i class="fas fa-undo me-1"></i>重置
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm" onclick="exportNetwork()">
+                                <i class="fas fa-download me-1"></i>导出
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="networkContainer" class="network-container">
+                            <div class="text-center text-muted py-5">
+                                <i class="fas fa-project-diagram fa-4x mb-3"></i>
+                                <h5>关系网络图</h5>
+                                <p>选择中心人物并点击"构建关系网络"开始分析</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 网络统计信息 -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            网络统计
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-3">
+                                <div class="h4 text-primary" id="nodeCount">0</div>
+                                <small class="text-muted">节点数</small>
+                            </div>
+                            <div class="col-3">
+                                <div class="h4 text-success" id="edgeCount">0</div>
+                                <small class="text-muted">边数</small>
+                            </div>
+                            <div class="col-3">
+                                <div class="h4 text-warning" id="density">0</div>
+                                <small class="text-muted">密度</small>
+                            </div>
+                            <div class="col-3">
+                                <div class="h4 text-info" id="avgDegree">0</div>
+                                <small class="text-muted">平均度</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 节点详情模态框 -->
+    <div class="modal fade" id="nodeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">节点详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="nodeDetails"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部 -->
+    <footer class="bg-dark text-light text-center py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">OSINT情报收集系统 v1.0.0 | 仅用于合法的开源情报收集</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="/static/js/main.js?v={{ request.query_params.get('v', '') or '' }}"></script>
+</body>
+</html> 

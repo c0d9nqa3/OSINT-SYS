@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSINT情报收集系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/static/css/main.css?v={{ request.query_params.get('v', '') or '' }}" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-search-location me-2"></i>
+                OSINT情报收集系统
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/docs" target="_blank">API文档</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4" id="mainPage">
+        <!-- 功能模块主页 -->
+        <div class="row">
+            <div class="col-12">
+                <div class="text-center mb-5">
+                    <h2 class="text-light mb-3">OSINT情报收集系统</h2>
+                    <p class="text-muted">专业的开源情报收集与分析平台</p>
+                </div>
+                
+
+                
+                <div class="row g-4">
+                    <!-- 信息武器库 -->
+                    <div class="col-lg-6">
+                        <div class="card h-100" style="border: 1px solid #4a5568; background: rgba(45, 55, 72, 0.4);">
+                            <div class="card-body text-center p-4">
+                                <div class="mb-3">
+                                    <i class="fas fa-warehouse fa-3x" style="color: #68d391;"></i>
+                                </div>
+                                <h4 class="card-title mb-3" style="color: #68d391;">信息武器库</h4>
+                                <p class="card-text text-muted mb-4">
+                                    管理和导入人物档案，构建目标信息库，支持文本解析和批量导入
+                                </p>
+                                <button class="btn btn-lg w-100" style="background: #2d3748; border: 1px solid #68d391; color: #68d391;" 
+                                        onmouseover="this.style.background='#68d391'; this.style.color='#1a202c';" 
+                                        onmouseout="this.style.background='#2d3748'; this.style.color='#68d391';" 
+                                        onclick="goToArsenal()">
+                                    <i class="fas fa-arrow-right me-2"></i>进入武器库
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 公开资源调查 -->
+                    <div class="col-lg-6">
+                        <div class="card h-100" style="border: 1px solid #4a5568; background: rgba(45, 55, 72, 0.4);">
+                            <div class="card-body text-center p-4">
+                                <div class="mb-3">
+                                    <i class="fas fa-search fa-3x" style="color: #63b3ed;"></i>
+                                </div>
+                                <h4 class="card-title mb-3" style="color: #63b3ed;">公开资源调查</h4>
+                                <p class="card-text text-muted mb-4">
+                                    基于目标姓名进行全网公开信息收集，社交媒体挖掘，网络足迹追踪
+                                </p>
+                                <button class="btn btn-lg w-100" style="background: #2d3748; border: 1px solid #63b3ed; color: #63b3ed;" 
+                                        onmouseover="this.style.background='#63b3ed'; this.style.color='#1a202c';" 
+                                        onmouseout="this.style.background='#2d3748'; this.style.color='#63b3ed';" 
+                                        onclick="goToInvestigation()">
+                                    <i class="fas fa-arrow-right me-2"></i>开始调查
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 关系网络构建分析 -->
+                    <div class="col-lg-6">
+                        <div class="card h-100" style="border: 1px solid #4a5568; background: rgba(45, 55, 72, 0.4);">
+                            <div class="card-body text-center p-4">
+                                <div class="mb-3">
+                                    <i class="fas fa-project-diagram fa-3x" style="color: #76e4f7;"></i>
+                                </div>
+                                <h4 class="card-title mb-3" style="color: #76e4f7;">关系网络构建分析</h4>
+                                <p class="card-text text-muted mb-4">
+                                    构建目标社交关系图谱，分析关系密度，识别关键人物和影响力节点
+                                </p>
+                                <button class="btn btn-lg w-100" style="background: #2d3748; border: 1px solid #76e4f7; color: #76e4f7;" 
+                                        onmouseover="this.style.background='#76e4f7'; this.style.color='#1a202c';" 
+                                        onmouseout="this.style.background='#2d3748'; this.style.color='#76e4f7';" 
+                                        onclick="goToNetwork()">
+                                    <i class="fas fa-arrow-right me-2"></i>关系分析
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 社工库查询 -->
+                    <div class="col-lg-6">
+                        <div class="card h-100" style="border: 1px solid #4a5568; background: rgba(45, 55, 72, 0.4);">
+                            <div class="card-body text-center p-4">
+                                <div class="mb-3">
+                                    <i class="fas fa-database fa-3x" style="color: #f6ad55;"></i>
+                                </div>
+                                <h4 class="card-title mb-3" style="color: #f6ad55;">社工库查询</h4>
+                                <p class="card-text text-muted mb-4">
+                                    查询公开数据泄露信息，密码字典生成，社会工程学情报收集
+                                </p>
+                                <button class="btn btn-lg w-100" style="background: #2d3748; border: 1px solid #f6ad55; color: #f6ad55;" 
+                                        onmouseover="this.style.background='#f6ad55'; this.style.color='#1a202c';" 
+                                        onmouseout="this.style.background='#2d3748'; this.style.color='#f6ad55';" 
+                                        onclick="goToSocialEngineering()">
+                                    <i class="fas fa-arrow-right me-2"></i>社工查询
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 信息攻击 -->
+                    <div class="col-lg-6">
+                        <div class="card h-100" style="border: 1px solid #4a5568; background: rgba(45, 55, 72, 0.4);">
+                            <div class="card-body text-center p-4">
+                                <div class="mb-3">
+                                    <i class="fas fa-crosshairs fa-3x" style="color: #fc8181;"></i>
+                                </div>
+                                <h4 class="card-title mb-3" style="color: #fc8181;">信息攻击</h4>
+                                <p class="card-text text-muted mb-4">
+                                    短信/电话轰炸攻击、沙盘模拟分析、弱点分析、渗透测试策略生成
+                                </p>
+                                <button class="btn btn-lg w-100" style="background: #2d3748; border: 1px solid #fc8181; color: #fc8181;" 
+                                        onmouseover="this.style.background='#fc8181'; this.style.color='#1a202c';" 
+                                        onmouseout="this.style.background='#2d3748'; this.style.color='#fc8181';" 
+                                        onclick="goToAttackPage()">
+                                    <i class="fas fa-arrow-right me-2"></i>开始攻击
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部 -->
+    <footer class="bg-dark text-light text-center py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">OSINT情报收集系统 v1.0.0 | 仅用于合法的开源情报收集</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/main.js?v={{ request.query_params.get('v', '') or '' }}"></script>
+</body>
+</html> 

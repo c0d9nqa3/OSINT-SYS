@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社工库查询 - OSINT情报收集系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/static/css/main.css?v={{ request.query_params.get('v', '') or '' }}" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-search-location me-2"></i>
+                OSINT情报收集系统
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">返回主页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/docs" target="_blank">API文档</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>
+                        <i class="fas fa-database me-2"></i>
+                        社工库查询
+                    </h2>
+                    <a href="/" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        返回主页
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- 左侧 - 查询控制 -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-search me-2"></i>
+                            数据泄露查询
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="breachQueryForm">
+                            <div class="mb-3">
+                                <label for="queryEmail" class="form-label">邮箱地址</label>
+                                <input type="email" class="form-control" id="queryEmail" 
+                                       placeholder="输入要查询的邮箱地址">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="queryPhone" class="form-label">手机号码</label>
+                                <input type="tel" class="form-control" id="queryPhone" 
+                                       placeholder="输入要查询的手机号码">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="queryUsername" class="form-label">用户名</label>
+                                <input type="text" class="form-control" id="queryUsername" 
+                                       placeholder="输入要查询的用户名">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="queryDomain" class="form-label">域名</label>
+                                <input type="text" class="form-control" id="queryDomain" 
+                                       placeholder="输入要查询的域名">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search me-2"></i>
+                                开始查询
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 密码字典生成 -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-key me-2"></i>
+                            密码字典生成
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <form id="passwordDictForm">
+                            <div class="mb-3">
+                                <label for="targetName" class="form-label">目标姓名</label>
+                                <input type="text" class="form-control" id="targetName" 
+                                       placeholder="输入目标姓名">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="birthDate" class="form-label">出生日期</label>
+                                <input type="date" class="form-control" id="birthDate">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="phoneNumber" class="form-label">手机号码</label>
+                                <input type="tel" class="form-control" id="phoneNumber" 
+                                       placeholder="输入手机号码">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="dictType" class="form-label">字典类型</label>
+                                <select class="form-select" id="dictType">
+                                    <option value="basic">基础字典</option>
+                                    <option value="advanced">高级字典</option>
+                                    <option value="comprehensive">综合字典</option>
+                                </select>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-warning w-100">
+                                <i class="fas fa-magic me-2"></i>
+                                生成密码字典
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 查询历史 -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-history me-2"></i>
+                            查询历史
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="queryHistory">
+                            <div class="text-center text-muted py-3">
+                                <i class="fas fa-history fa-2x mb-2"></i>
+                                <p class="small">暂无查询历史</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧 - 查询结果 -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-list me-2"></i>
+                            查询结果
+                        </h5>
+                        <div>
+                            <button class="btn btn-outline-secondary btn-sm me-2" onclick="clearResults()">
+                                <i class="fas fa-eraser me-1"></i>清空
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm" onclick="exportResults()">
+                                <i class="fas fa-download me-1"></i>导出
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="queryResults">
+                            <div class="text-center text-muted py-5">
+                                <i class="fas fa-database fa-4x mb-3"></i>
+                                <h5>社工库查询</h5>
+                                <p>输入查询条件开始搜索数据泄露信息</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 统计信息 -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            查询统计
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-3">
+                                <div class="h4 text-primary" id="totalBreaches">0</div>
+                                <small class="text-muted">总泄露数</small>
+                            </div>
+                            <div class="col-3">
+                                <div class="h4 text-success" id="uniqueEmails">0</div>
+                                <small class="text-muted">唯一邮箱</small>
+                            </div>
+                            <div class="col-3">
+                                <div class="h4 text-warning" id="uniquePasswords">0</div>
+                                <small class="text-muted">唯一密码</small>
+                            </div>
+                            <div class="col-3">
+                                <div class="h4 text-info" id="affectedSites">0</div>
+                                <small class="text-muted">受影响网站</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 详情模态框 -->
+    <div class="modal fade" id="breachDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">泄露详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="breachDetails"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部 -->
+    <footer class="bg-dark text-light text-center py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">OSINT情报收集系统 v1.0.0 | 仅用于合法的开源情报收集</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/main.js?v={{ request.query_params.get('v', '') or '' }}"></script>
+</body>
+</html> 

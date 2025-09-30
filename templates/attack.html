@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>信息攻击 - OSINT情报收集系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/static/css/main.css?v={{ request.query_params.get('v', '') or '' }}" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-search-location me-2"></i>
+                OSINT情报收集系统
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">返回主页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/docs" target="_blank">API文档</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>
+                        <i class="fas fa-crosshairs me-2"></i>
+                        信息攻击
+                    </h2>
+                    <a href="/" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        返回主页
+                    </a>
+                </div>
+                
+                <!-- 攻击功能标签页 -->
+                <ul class="nav nav-tabs mb-4" id="attackTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="bombing-tab" data-bs-toggle="tab" data-bs-target="#bombing" type="button" role="tab">
+                            <i class="fas fa-bomb me-1"></i>短信/电话轰炸
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="simulation-tab" data-bs-toggle="tab" data-bs-target="#simulation" type="button" role="tab">
+                            <i class="fas fa-chess-board me-1"></i>沙盘模拟
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="weakness-tab" data-bs-toggle="tab" data-bs-target="#weakness" type="button" role="tab">
+                            <i class="fas fa-bug me-1"></i>弱点分析
+                        </button>
+                    </li>
+                </ul>
+                
+                <!-- 标签页内容 -->
+                <div class="tab-content" id="attackTabContent">
+                    <!-- 短信/电话轰炸标签页 -->
+                    <div class="tab-pane fade show active" id="bombing" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label class="form-label">选择目标人物</label>
+                                    <select class="form-select" id="bombingTargetSelect" onchange="checkBombingTarget()">
+                                        <option value="">请选择目标人物...</option>
+                                    </select>
+                                </div>
+                                
+                                <div id="bombingTargetInfo" class="alert alert-info" style="display: none;">
+                                    <h6><i class="fas fa-user me-2"></i>目标信息</h6>
+                                    <div id="bombingTargetDetails"></div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label">攻击类型</label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="smsBombing" value="sms">
+                                            <label class="form-check-label" for="smsBombing">短信轰炸</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="phoneBombing" value="phone">
+                                            <label class="form-check-label" for="phoneBombing">电话轰炸</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">攻击强度</label>
+                                        <select class="form-select" id="bombingIntensity">
+                                            <option value="low">轻度 (10-20次)</option>
+                                            <option value="medium">中度 (20-50次)</option>
+                                            <option value="high">重度 (50-100次)</option>
+                                            <option value="extreme">极重度 (100+次)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">攻击间隔 (秒)</label>
+                                    <input type="number" class="form-control" id="bombingInterval" value="5" min="1" max="60">
+                                </div>
+                                
+                                <button class="btn btn-danger" id="startBombingBtn" onclick="startBombing()" disabled>
+                                    <i class="fas fa-play me-1"></i>开始攻击
+                                </button>
+                                <button class="btn btn-secondary ms-2" id="stopBombingBtn" onclick="stopBombing()" style="display: none;">
+                                    <i class="fas fa-stop me-1"></i>停止攻击
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="alert alert-warning">
+                                    <h6><i class="fas fa-exclamation-triangle me-2"></i>注意事项</h6>
+                                    <ul class="small mb-0">
+                                        <li>仅限包含本人手机号的档案</li>
+                                        <li>请遵守相关法律法规</li>
+                                        <li>建议在测试环境中使用</li>
+                                    </ul>
+                                </div>
+                                
+                                <div id="bombingStatus" class="mt-3" style="display: none;">
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar bg-danger" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                    <small class="text-muted" id="bombingProgress">准备中...</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 沙盘模拟标签页 -->
+                    <div class="tab-pane fade" id="simulation" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label class="form-label">选择模拟目标</label>
+                                    <select class="form-select" id="simulationTargetSelect" onchange="checkSimulationTarget()">
+                                        <option value="">请选择模拟目标...</option>
+                                    </select>
+                                </div>
+                                
+                                <div id="simulationTargetInfo" class="alert alert-warning" style="display: none;">
+                                    <h6><i class="fas fa-user me-2"></i>目标档案信息</h6>
+                                    <div id="simulationTargetDetails"></div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">模拟场景</label>
+                                    <select class="form-select" id="simulationScenario">
+                                        <option value="">请选择模拟场景...</option>
+                                        <option value="social_engineering">社交工程攻击</option>
+                                        <option value="phishing">钓鱼攻击</option>
+                                        <option value="information_gathering">信息收集</option>
+                                        <option value="psychological_manipulation">心理操控</option>
+                                        <option value="trust_building">信任建立</option>
+                                        <option value="pressure_tactics">压力战术</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">攻击策略</label>
+                                    <textarea class="form-control" id="attackStrategy" rows="3" placeholder="描述您计划使用的具体攻击策略和方法..."></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">预期目标</label>
+                                    <textarea class="form-control" id="expectedOutcome" rows="2" placeholder="您希望通过这次攻击达到什么目标？"></textarea>
+                                </div>
+                                
+                                <button class="btn btn-warning" id="startSimulationBtn" onclick="startSimulation()" disabled>
+                                    <i class="fas fa-play me-1"></i>开始模拟
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="alert alert-info">
+                                    <h6><i class="fas fa-info-circle me-2"></i>模拟说明</h6>
+                                    <p class="small mb-0">沙盘模拟将基于目标档案数据，分析攻击策略的可行性和潜在后果，帮助您制定更有效的攻击计划。</p>
+                                </div>
+                                
+                                <div id="simulationStatus" class="mt-3" style="display: none;">
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                    <small class="text-muted" id="simulationProgress">模拟分析中...</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 弱点分析标签页 -->
+                    <div class="tab-pane fade" id="weakness" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label class="form-label">选择分析目标</label>
+                                    <select class="form-select" id="weaknessTargetSelect" onchange="checkWeaknessTarget()">
+                                        <option value="">请选择分析目标...</option>
+                                    </select>
+                                </div>
+                                
+                                <div id="weaknessTargetInfo" class="alert alert-warning" style="display: none;">
+                                    <h6><i class="fas fa-user me-2"></i>目标档案信息</h6>
+                                    <div id="weaknessTargetDetails"></div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">分析维度</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="psychologicalWeakness" value="psychological" checked>
+                                        <label class="form-check-label" for="psychologicalWeakness">心理弱点</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="socialWeakness" value="social" checked>
+                                        <label class="form-check-label" for="socialWeakness">社交弱点</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="technicalWeakness" value="technical">
+                                        <label class="form-check-label" for="technicalWeakness">技术弱点</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="physicalWeakness" value="physical">
+                                        <label class="form-check-label" for="physicalWeakness">物理弱点</label>
+                                    </div>
+                                </div>
+                                
+                                <button class="btn btn-warning" id="analyzeWeaknessBtn" onclick="analyzeWeakness()" disabled>
+                                    <i class="fas fa-search me-1"></i>开始分析
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="alert alert-danger">
+                                    <h6><i class="fas fa-exclamation-triangle me-2"></i>分析说明</h6>
+                                    <p class="small mb-0">弱点分析将识别目标在多个维度的安全漏洞，为您的攻击策略提供重要参考。请谨慎使用分析结果。</p>
+                                </div>
+                                
+                                <div id="weaknessStatus" class="mt-3" style="display: none;">
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                    <small class="text-muted" id="weaknessProgress">弱点分析中...</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 结果报告区域 -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card" id="attackReportCard" style="display: none;">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-chart-line me-2"></i>
+                                    分析报告
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="attackReportContent">
+                                    <!-- 分析结果将在这里显示 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部 -->
+    <footer class="bg-dark text-light text-center py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">OSINT情报收集系统 v1.0.0 | 仅用于合法的开源情报收集</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/main.js?v={{ request.query_params.get('v', '') or '' }}"></script>
+</body>
+</html> 

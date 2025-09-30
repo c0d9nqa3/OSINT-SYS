@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公开资源调查 - OSINT情报收集系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/static/css/main.css?v={{ request.query_params.get('v', '') or '' }}" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-search-location me-2"></i>
+                OSINT情报收集系统
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">返回主页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/docs" target="_blank">API文档</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>
+                        <i class="fas fa-search me-2"></i>
+                        公开资源调查
+                    </h2>
+                    <a href="/" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        返回主页
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- 左侧 - 新建调查 -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-plus-circle me-2"></i>
+                            新建调查
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="newInvestigationForm">
+                            <div class="mb-3">
+                                <label for="targetName" class="form-label">目标人物姓名</label>
+                                <input type="text" class="form-control" id="targetName" required 
+                                       placeholder="请输入要调查的人物姓名">
+                                <div class="form-text">请输入真实的姓名，至少2个字符</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="userId" class="form-label">用户ID（可选）</label>
+                                <input type="text" class="form-control" id="userId" 
+                                       placeholder="匿名用户" value="anonymous">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search me-2"></i>
+                                开始调查
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 系统状态 -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            调查状态
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <div class="h4 text-primary" id="activeInvestigations">0</div>
+                                <small class="text-muted">进行中调查</small>
+                            </div>
+                            <div class="col-6">
+                                <div class="h4 text-success" id="completedInvestigations">0</div>
+                                <small class="text-muted">已完成调查</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧 - 调查列表 -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-list me-2"></i>
+                            调查列表
+                        </h5>
+                        <button class="btn btn-outline-primary btn-sm" onclick="refreshInvestigations()">
+                            <i class="fas fa-sync-alt me-1"></i>
+                            刷新
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="investigationsContainer">
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-search fa-3x mb-3"></i>
+                                <p>暂无调查记录</p>
+                                <p class="small">点击"开始调查"创建新的调查任务</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 调查详情模态框 -->
+    <div class="modal fade" id="investigationModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">调查详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="investigationDetails">
+                        <!-- 调查详情将通过JavaScript动态加载 -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" id="exportInvestigation">
+                        <i class="fas fa-download me-1"></i>
+                        导出报告
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 人物详情模态框 -->
+    <div class="modal fade" id="personModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">人物详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="personDetails"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部 -->
+    <footer class="bg-dark text-light text-center py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">OSINT情报收集系统 v1.0.0 | 仅用于合法的开源情报收集</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/main.js?v={{ request.query_params.get('v', '') or '' }}"></script>
+</body>
+</html> 

@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-An **experimental open-source intelligence collection system** designed for research and educational purposes. This is a demo system that integrates various AI technologies to collect, verify, and analyze publicly available information.
+An **experimental open-source intelligence collection system** designed for research purposes. This is a demo system that integrates various AI technologies to collect, verify, and analyze publicly available information.
 
 **Current Status**: This is an experimental project. AI-related models are still under development, including psychological vulnerability analysis and social engineering research.
 
@@ -102,25 +102,13 @@ Web Frontend ←→ API Service ←→ Data Collectors
 
 ## Important Notes
 
-**Experimental Purpose**: This is a demo system for research and educational purposes only.
+**Experimental Purpose**: This is a demo system for research purposes only.
 
 **AI Development**: AI-related models, including psychological vulnerability analysis and social engineering research, are currently under development.
-
-**Legal Compliance**: Only collects publicly available information. Respects robots.txt and implements rate limiting.
 
 **Collaboration**: We welcome researchers, developers, and security professionals to collaborate on this project.
 
 ## Development
-
-### Project Structure
-```
-osint-system/
-├── app/                    # Application
-├── static/                 # Static files
-├── templates/              # HTML templates
-├── requirements.txt        # Dependencies
-└── main.py                # Main program
-```
 
 ### Contributing
 1. Follow code standards
@@ -134,8 +122,4 @@ MIT License - see LICENSE file for details.
 
 ## Disclaimer
 
-This tool is for legitimate open-source intelligence collection only. Users must ensure compliance with local laws and respect website terms of use. Developers bear no responsibility for misuse.
-
----
-
-**OSINT Intelligence Collection System** - Experimental research platform for intelligence gathering 
+This tool is for legitimate intelligence collection only. Users must ensure compliance with local laws and respect website terms of use. Developers bear no responsibility for misuse.
